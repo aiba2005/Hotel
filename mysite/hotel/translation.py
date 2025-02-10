@@ -11,4 +11,4 @@ class ActorTranslationOptions(TranslationOptions):
 
 @register(City)
 class CountryTranslationOptions(TranslationOptions):
-    fields = ('city_name',)
+    fields = ('city_name', 'country')

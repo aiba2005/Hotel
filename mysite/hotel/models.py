@@ -1,6 +1,7 @@
+from sys import maxunicode
+
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.db.models import ForeignKey
 from phonenumber_field.modelfields import PhoneNumberField
 from django.core.validators import MinValueValidator, MaxValueValidator
 
@@ -36,30 +37,20 @@ class Profile(AbstractUser):
 
 
 class City(models.Model):
-   city_name = models.CharField(max_length=32, unique=True)
-
-   def __str__(self):
-       return self.city_name
+    country = models.CharField(max_length=23)
+    city_name = models.CharField(max_length=32)
+    def __str__(self):
+        return f'{self.city_name}, {self.country}'
 
 
 class Room(models.Model):
     room_numbers = models.IntegerField(choices=[(i, str(i)) for i in range(1, 31)])
     status = models.CharField(choices=TYPE_CHOICES, max_length=64, default='free')
     room_types = models.CharField(choices=ROOM_CHOICES, max_length=64, default='1kom')
-    description = models.TextField()
+    price = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-       return f'{self.room_numbers}, {self.status},'
-
-
-class Booking(models.Model):
-    user = models.ForeignKey(Profile, on_delete=models.CASCADE)
-    data =models.DateField()
-    room = models.ManyToManyField(Room)
-
-
-    def __str__(self):
-        return self.room
+       return f'{self.status}, {self.room_numbers} - number, {self.room_types}'
 
 
 class Hotel(models.Model):
@@ -70,7 +61,7 @@ class Hotel(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.hotel_name
+        return f'{self.hotel_name}'
 
 
 
@@ -90,7 +81,7 @@ class Hotel(models.Model):
 
 class HotelImages(models.Model):
     image = models.ImageField(upload_to='hotel_images', null=True, blank=True)
-    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='image')
 
 
 
@@ -106,12 +97,19 @@ class Review(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.user
+        return f'{self.user}'
 
 
+class Booking(models.Model):
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
+    check_in=models.DateTimeField()
+    departure = models.DateTimeField()
+    adults =models.PositiveSmallIntegerField(default=1)
+    children = models.PositiveSmallIntegerField(default=0)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    created_date = models.DateTimeField(auto_now_add=True)
 
 
-
-
-
-
+    def __str__(self):
+        return f'{self.room}'

@@ -25,7 +25,7 @@ class BookingView(viewsets.ModelViewSet):
 
 class HotelView(viewsets.ModelViewSet):
     queryset = Hotel.objects.all()
-    serializer_class = HotelSerializer
+    serializer_class = HotelListSerializer
 
 
 class ReviewView(viewsets.ModelViewSet):
