@@ -18,16 +18,29 @@ class RoomView(viewsets.ModelViewSet):
     serializer_class = RoomSerializer
 
 
-class BookingView(viewsets.ModelViewSet):
+class BookingCreateAPIView(generics.CreateAPIView):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
 
 
-class HotelView(viewsets.ModelViewSet):
+class HotelListAPIView(generics.ListAPIView):
     queryset = Hotel.objects.all()
     serializer_class = HotelListSerializer
 
+class HotelDetailAPIView(generics.RetrieveAPIView):
+    queryset = Hotel.objects.all()
+    serializer_class = HotelDetailSerializer
 
-class ReviewView(viewsets.ModelViewSet):
+
+class ReviewCreateAPIView(generics.CreateAPIView):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+
+class ReviewEditAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+
+
+class ReviewListAPIView(generics.ListAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
