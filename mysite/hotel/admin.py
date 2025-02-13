@@ -7,6 +7,9 @@ class HotelImagesInline(admin.TabularInline):
     model = HotelImages
     extra = 1
 
+class RoomImageInline(admin.TabularInline):
+    model = RoomImage
+    extra = 1
 
 
 @admin.register( City )
@@ -27,8 +30,12 @@ class CityAdmin(TranslationAdmin):
 class HotelAdmin(CityAdmin):
     inlines =[HotelImagesInline]
 
+@admin.register(Room)
+class RoomAdmin(admin.ModelAdmin):
+    inlines = [RoomImageInline]
+
+
 
 admin.site.register(Profile)
 admin.site.register(Review)
-admin.site.register(Room)
 admin.site.register(Booking)

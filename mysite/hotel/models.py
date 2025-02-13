@@ -1,21 +1,20 @@
-from sys import maxunicode
-
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from phonenumber_field.modelfields import PhoneNumberField
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 TYPE_CHOICES = (
-    ('free', 'free'),
-    ('booked', 'booked'),
-    ('busy', 'busy'),
+    ('свободно', 'свободно'),
+    ('забронировано', 'забронировано'),
+    ('занято', 'занято')
 )
 
 ROOM_CHOICES = (
-        ('1kom', '1kom'),
-        ('2kom', '2kom'),
-        ('domestic', 'domestic'),
-    )
+    ('люкс', 'люкс'),
+    ('семейный', 'семейный'),
+    ('одноместный', 'одноместный'),
+    ('двухместный', 'двухместный')
+)
 
 
 
@@ -43,20 +42,10 @@ class City(models.Model):
         return f'{self.city_name}, {self.city_image}'
 
 
-class Room(models.Model):
-    room_numbers = models.IntegerField(choices=[(i, str(i)) for i in range(1, 31)])
-    status = models.CharField(choices=TYPE_CHOICES, max_length=64, default='free')
-    room_types = models.CharField(choices=ROOM_CHOICES, max_length=64, default='1kom')
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-
-    def __str__(self):
-       return f'{self.status}, {self.room_numbers} - number, {self.room_types}'
-
-
 class Hotel(models.Model):
     hotel_name = models.CharField(max_length=64)
     country = models.CharField(max_length=64)
-    city= models.ForeignKey(City, on_delete=models.CASCADE)
+    city= models.ForeignKey(City, on_delete=models.CASCADE, related_name='hotel_city')
     description = models.TextField()
     status_hotel = models.IntegerField(choices=[(i, str(i)) for i in range(1, 6)])
     created_date = models.DateTimeField(auto_now_add=True)
@@ -64,7 +53,6 @@ class Hotel(models.Model):
 
     def __str__(self):
         return f'{self.hotel_name}'
-
 
 
     def get_avg_rating(self):
@@ -82,8 +70,8 @@ class Hotel(models.Model):
 
 
 class HotelImages(models.Model):
-    image = models.ImageField(upload_to='hotel_images', null=True, blank=True)
-    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='image')
+    hotel_image = models.ImageField(upload_to='hotel_images', null=True, blank=True)
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='hotel_image')
 
 
 
@@ -98,13 +86,31 @@ class Review(models.Model):
     text = models.TextField( null=True, blank=True)
     created_date = models.DateTimeField(auto_now_add=True)
 
+def __str__(self):
+        return (f'{self.user}, {'hotel'}, {'person'}, {'comfort'},'
+                f' {'purity'}, {'free_WiFi'}, {'location'},')
+
+
+class Room(models.Model):
+    room_numbers = models.IntegerField(choices=[(i, str(i)) for i in range(1, 31)])
+    status = models.CharField(choices=TYPE_CHOICES, max_length=64, default='свободно')
+    room_types = models.CharField(choices=ROOM_CHOICES, max_length=64, default='одноместный')
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='room')
     def __str__(self):
-        return f'{self.user}'
+       return f'{self.status}, {self.room_numbers} - number, {self.room_types}'
+
+
+
+class RoomImage(models.Model):
+    room_image = models.ImageField(upload_to='room_images')
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='room_images')
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='room_image')
 
 
 class Booking(models.Model):
     user = models.ForeignKey(Profile, on_delete=models.CASCADE)
-    booking = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='booking')
+    booking_hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='booking')
     check_in=models.DateTimeField()
     departure = models.DateTimeField()
     adults =models.PositiveSmallIntegerField(default=1)
